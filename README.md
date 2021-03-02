@@ -1,5 +1,7 @@
 # OpenPix Backend Integration Example
 
+Pix Example Using the [OpenPix](https://openpix.com.br/) Platform. [OpenPix Developers](https://developers.openpix.com.br/)
+
 Basic OpenPix Backend Integration Example
 
 This is a sample of how to integrate OpenPix Api in your backend
