@@ -3,8 +3,8 @@ import { debugConsole } from './debugConsole';
 import Donation, { DONATION_STATUS } from './modules/donation/DonationModel';
 
 export type WebhookPostBody = {
-  charges: ChargesItem[]
-  pix: PixItem[]
+  charge: ChargesItem,
+  pix: PixItem
 }
 export type ChargesItem = {
   _id: string
@@ -42,27 +42,28 @@ export const webhookPost = async (ctx: ParameterizedContext<{}, {}, WebhookPostB
     params: ctx.params,
   });
 
-  const { charges, pixTransactions } = ctx.request.body;
+  // eslint-disable-next-link
+  const { charge, pixTransaction } = ctx.request.body;
 
-  for (const charge of charges) {
-    const donation = await Donation.findOne({
-      _id: charge.correlationID,
+  const donation = await Donation.findOne({
+    _id: charge.correlationID,
+  });
+
+  if (!donation) {
+    ctx.body = {};
+    ctx.status = 200;
+    return;
+  }
+
+  // donation was paied
+  if (charge.status === 'COMPLETED') {
+    await Donation.updateOne({
+      _id: donation._id,
+    }, {
+      $set: {
+        status: DONATION_STATUS.PAIED,
+      },
     });
-
-    if (!donation) {
-      continue;
-    }
-
-    // donation was paied
-    if (charge.status === 'COMPLETED') {
-      await Donation.updateOne({
-        _id: donation._id,
-      }, {
-        $set: {
-          status: DONATION_STATUS.PAIED,
-        },
-      });
-    }
   }
 
   ctx.body = {};
