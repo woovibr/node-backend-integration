@@ -36,14 +36,32 @@ export type Raw = {
   infoPagador: string
 }
 
+export const webhookSecret = 'Do not tell anyone';
+
 export const webhookPost = async (ctx: ParameterizedContext<{}, {}, WebhookPostBody>) => {
   debugConsole({
     body: ctx.request.body,
     params: ctx.params,
+    headers: ctx.headers,
   });
+
+  // this make sure this call was made by OpenPix services
+  if (ctx.headers.authorization !== webhookSecret) {
+    ctx.status = 401;
+    ctx.body = {
+      error: 'unauthorized',
+    };
+    return;
+  }
 
   // eslint-disable-next-link
   const { charge, pixTransaction } = ctx.request.body;
+
+  // webhook payload of test
+  if (!charge && !pixTransaction) {
+    ctx.status = 200;
+    return;
+  }
 
   const donation = await Donation.findOne({
     _id: charge.correlationID,

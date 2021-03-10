@@ -1,5 +1,6 @@
 import 'isomorphic-fetch';
 import { webhookPost } from '../src/openpixApi/webhookPost';
+import { webhookSecret } from '../src/webhookPost';
 
 const run = async () => {
   const payload = {
@@ -7,7 +8,7 @@ const run = async () => {
       isActive: true,
       name: 'OpenPix Backend Integration',
       url: 'http://localhost:5666/webhook',
-      authorization: 'BackendIntegration',
+      authorization: webhookSecret,
     },
   };
 
