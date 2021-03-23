@@ -1,6 +1,7 @@
 import { ParameterizedContext } from 'koa';
 import { debugConsole } from './debugConsole';
 import Donation, { DONATION_STATUS } from './modules/donation/DonationModel';
+import { Types } from 'mongoose';
 
 export type WebhookPostBody = {
   charge: ChargesItem,
@@ -60,6 +61,13 @@ export const webhookPost = async (ctx: ParameterizedContext<{}, {}, WebhookPostB
   // webhook payload of test
   if (!charge && !pixTransaction) {
     ctx.status = 200;
+    return;
+  }
+
+  if (!Types.ObjectId.isValid(charge.correlationID)) {
+    console.log('invalid correlationID: ', {
+      charge,
+    });
     return;
   }
 
