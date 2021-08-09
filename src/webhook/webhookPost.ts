@@ -57,19 +57,6 @@ export const webhookPost = async (ctx: ParameterizedContext<{}, {}, WebhookPostB
     return;
   }
 
-  const signature = hmacCalculateSignature(
-    config.HMAC_SECRET_KEY,
-    JSON.stringify(ctx.request.body),
-    ctx.headers['x-openpix-signature']
-  );
-
-  console.log({
-    b: ctx.request.body,
-    secret: config.HMAC_SECRET_KEY,
-    hS: ctx.headers['x-openpix-signature'],
-    signature,
-  });
-
   // validate HMAC Signature
   if (!hmacVerifySignature(
     config.HMAC_SECRET_KEY,
