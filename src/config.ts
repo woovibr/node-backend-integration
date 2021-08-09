@@ -17,4 +17,5 @@ export const config = {
   OPENPIX_API: process.env.OPENPIX_API,
   APP_ID: process.env.APP_ID,
   MONGO_URI: process.env.MONGO_URI,
+  HMAC_SECRET_KEY: process.env.HMAC_SECRET_KEY,
 }

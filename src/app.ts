@@ -3,7 +3,7 @@ import koaLogger from 'koa-logger';
 import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
 import Router from '@koa/router';
-import { webhookPost } from './webhookPost';
+import { webhookPost } from './webhook/webhookPost';
 import { donationGet } from './modules/donation/donationGet';
 import { donationPost } from './modules/donation/donationPost';
 
