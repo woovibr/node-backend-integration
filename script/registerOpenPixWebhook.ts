@@ -1,6 +1,6 @@
 import 'isomorphic-fetch';
 import { webhookPost } from '../src/openpixApi/webhookPost';
-import { webhookSecret } from '../src/webhookPost';
+import { webhookSecret } from '../src/webhook/webhookPost';
 
 const run = async () => {
   const payload = {

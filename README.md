@@ -22,6 +22,7 @@ PORT=5666
 OPENPIX_API=https://api.openpix.com.br/
 APP_ID=<your app id>
 MONGO_URI=mongodb://localhost/donation
+HMAC_SECRET_KEY=<openpix_hmac_secret_key>
 ```
 
 ## How to run

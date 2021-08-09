@@ -1,7 +1,9 @@
 import { ParameterizedContext } from 'koa';
-import { debugConsole } from './debugConsole';
-import Donation, { DONATION_STATUS } from './modules/donation/DonationModel';
+import { debugConsole } from '../debugConsole';
+import Donation, { DONATION_STATUS } from '../modules/donation/DonationModel';
 import { Types } from 'mongoose';
+import { hmacCalculateSignature, hmacVerifySignature } from './hmacSignature';
+import { config } from '../config';
 
 export type WebhookPostBody = {
   charge: ChargesItem,
@@ -50,7 +52,33 @@ export const webhookPost = async (ctx: ParameterizedContext<{}, {}, WebhookPostB
   if (ctx.headers.authorization !== webhookSecret) {
     ctx.status = 401;
     ctx.body = {
-      error: 'unauthorized',
+      error: 'Invalid Authorization',
+    };
+    return;
+  }
+
+  const signature = hmacCalculateSignature(
+    config.HMAC_SECRET_KEY,
+    JSON.stringify(ctx.request.body),
+    ctx.headers['x-openpix-signature']
+  );
+
+  console.log({
+    b: ctx.request.body,
+    secret: config.HMAC_SECRET_KEY,
+    hS: ctx.headers['x-openpix-signature'],
+    signature,
+  });
+
+  // validate HMAC Signature
+  if (!hmacVerifySignature(
+    config.HMAC_SECRET_KEY,
+    JSON.stringify(ctx.request.body),
+    ctx.headers['x-openpix-signature']
+  )) {
+    ctx.status = 401;
+    ctx.body = {
+      error: 'Invalid HMAC',
     };
     return;
   }
