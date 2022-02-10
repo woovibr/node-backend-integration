@@ -57,6 +57,15 @@ export const webhookPost = async (ctx: ParameterizedContext<{}, {}, WebhookPostB
     return;
   }
 
+  // eslint-disable-next-link
+  const { charge, pixTransaction } = ctx.request.body;
+
+  // webhook payload of test
+  if (!charge && !pixTransaction) {
+    ctx.status = 200;
+    return;
+  }
+
   // validate HMAC Signature
   if (!hmacVerifySignature(
     config.HMAC_SECRET_KEY,
@@ -67,15 +76,6 @@ export const webhookPost = async (ctx: ParameterizedContext<{}, {}, WebhookPostB
     ctx.body = {
       error: 'Invalid HMAC',
     };
-    return;
-  }
-
-  // eslint-disable-next-link
-  const { charge, pixTransaction } = ctx.request.body;
-
-  // webhook payload of test
-  if (!charge && !pixTransaction) {
-    ctx.status = 200;
     return;
   }
 
