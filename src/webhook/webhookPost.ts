@@ -2,8 +2,10 @@ import { ParameterizedContext } from 'koa';
 import { debugConsole } from '../debugConsole';
 import Donation, { DONATION_STATUS } from '../modules/donation/DonationModel';
 import { Types } from 'mongoose';
-import { hmacCalculateSignature, hmacVerifySignature } from './hmacSignature';
+import { hmacVerifySignature } from './hmacSignature';
 import { config } from '../config';
+import { isWebhookAuthorizationValid } from './webhookValidateAuthorization';
+import { webhookValidatePublicKey } from './webhookValidatePublicKey';
 
 export type WebhookPostBody = {
   charge: ChargesItem,
@@ -49,10 +51,20 @@ export const webhookPost = async (ctx: ParameterizedContext<{}, {}, WebhookPostB
   });
 
   // this make sure this call was made by OpenPix services
-  if (ctx.headers.authorization !== webhookSecret) {
+  if (!isWebhookAuthorizationValid(ctx)) {
+    console.log('invalid authorization');
     ctx.status = 401;
     ctx.body = {
       error: 'Invalid Authorization',
+    };
+    return;
+  }
+
+  if (!webhookValidatePublicKey(ctx)) {
+    console.log('invalid webhook public key');
+    ctx.status = 401;
+    ctx.body = {
+      error: 'Invalid Webhook Public Key',
     };
     return;
   }
@@ -72,6 +84,7 @@ export const webhookPost = async (ctx: ParameterizedContext<{}, {}, WebhookPostB
     JSON.stringify(ctx.request.body),
     ctx.headers['x-openpix-signature']
   )) {
+    console.log('invalid HMAC: ');
     ctx.status = 401;
     ctx.body = {
       error: 'Invalid HMAC',
