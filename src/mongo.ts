@@ -27,9 +27,5 @@ export const connectDatabase = () => new Promise((resolve, reject) => {
         resolve();
       });
 
-    mongoose.connect(config.MONGO_URI, {
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useUnifiedTopology: true,
-    });
+    mongoose.connect(config.MONGO_URI);
   });
